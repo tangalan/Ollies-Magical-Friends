@@ -134,7 +134,9 @@ export function ConsolePage() {
             <button onClick={handleLogout}>Logout</button>
           </div>
           <Link to="/dashboard">
-              <img src="/setting-lines.png" alt="Dashboard" />
+              <img src="/setting-lines.png" 
+              className="dashboard-icon"
+              alt="Dashboard" />
           </Link>
         </div>
     

@@ -175,12 +175,12 @@ export function StorytimeStacy () {
    * WavRecorder taks speech input, WavStreamPlayer output, client is API client
    */
   const connectConversation = useCallback(async () => {
-    console.log(process.env.REACT_APP_OPENAI_API_KEY)
     const client = clientRef.current;
     
     const wavRecorder = wavRecorderRef.current;
     const wavStreamPlayer = wavStreamPlayerRef.current;
 
+    // retrieve data from database 
     try {
       const response = await fetch(`${process.env.REACT_APP_DATABASE_URL}/conversations`);
       if (!response.ok) {
@@ -224,16 +224,10 @@ export function StorytimeStacy () {
 
 
   /* Push data to the database */
-  const pushToDatabase = async (items: ItemType[]) => {
+  const pushToDatabase = async (items:  object[], summary: string) => {
     const dateTime = new Date().toISOString(); // Get current date and time inline
-    items = clientRef.current.conversation.getItems();
-    const filteredItems = items.map(item => {
-      return {
-          role: item.role,
-          content: item.formatted.transcript || item.formatted.text
-      };
-  });
-    const summary = "hello this is a summary"
+
+    // const summary = "hello this is a summary"
     try {
       const response = await fetch(`${process.env.REACT_APP_DATABASE_URL}/conversations`, {
         method: 'POST',
@@ -241,7 +235,7 @@ export function StorytimeStacy () {
           'Content-Type': 'application/json',
           // Authorization: `Bearer ${process.env.REACT_APP_RENDER_API_KEY}`, // Optional: Use if your backend requires authentication
         },
-        body: JSON.stringify({items : filteredItems, summary }),
+        body: JSON.stringify({items : items, summary }),
       });
   
       if (!response.ok) {
@@ -261,22 +255,27 @@ export function StorytimeStacy () {
    * Disconnect and reset conversation state
    */
   const disconnectConversation = useCallback(async () => {
-    console.log(process.env.REACT_APP_BACKEND_API_URL)
-    console.log(process.env.REACT_APP_API_KEY)
-    console.log(typeof(clientRef.current.conversation.getItems()));
-    const convo = JSON.stringify(clientRef.current.conversation.getItems()); 
-    console.log(convo);
+    const items = clientRef.current.conversation.getItems();
+    const filteredItems = items.map(item => {
+      return {
+          role: item.role,
+          content: item.formatted.transcript || item.formatted.text
+      };
+  });
+  // console.log(typeof(filteredItems));
+  // console.log(filteredItems);
     const conv_summary = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
         {"role": "system", "content": "You are a assistant helping a parent summary the transcript of his child's conversations with an AI Bot. Summarise the input in one paragraph, picking out  content that a parent might want to know about. Inlude any important quotes and details that might be relevant to the parent."},
-        {"role": "user", "content": `Summarise this conversation based on this transcript in json format: "${convo}"`}
+        {"role": "user", "content": `Summarise this conversation based on this transcript in json format: "${JSON.stringify(filteredItems)}"`}
       ]
     }); 
 
-    console.log (conv_summary.choices[0]);
+    console.log (conv_summary.choices[0].message.content);
+    console.log (typeof(conv_summary.choices[0].message.content));
 
-    await pushToDatabase(items);
+    await pushToDatabase(filteredItems, String(conv_summary.choices[0].message.content));
 
     setIsConnected(false);
     setRealtimeEvents([]);
