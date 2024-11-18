@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import OpenAI from 'openai';
+import './Query.scss';
+
 
 interface Item {
     role: string;
@@ -22,7 +24,7 @@ interface Item {
     const [query, setQuery] = useState('');
     const [result, setResult] = useState('');
 
-  const handleQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleQueryChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setQuery(event.target.value);
   };
 
@@ -36,7 +38,9 @@ interface Item {
     const response = await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
-          {"role": "system", "content": `You are an assistant helping a parent answer database queries about a child's conversations with AI bots. Use only the provided conversations data as the data source. Conversations data: ${JSON.stringify(conversations)}`},
+          {"role": "system", "content": `You are an assistant helping a parent answer database queries about a child's conversations with AI bots. 
+            Use only the provided conversations data as the data source. Do not answer any questions that require knowledge outside of the provided data.
+            Conversations data: ${JSON.stringify(conversations)}`},
           {"role": "user", "content": query}
         ]
       }); 
@@ -75,13 +79,13 @@ interface Item {
 
   return (
     <div>
-      <h2>Query OpenAI</h2>
+      <h2>Query Conversations</h2>
       <form onSubmit={handleQuerySubmit}>
-        <input
-          type="text"
+        <textarea
           value={query}
           onChange={handleQueryChange}
           placeholder="Enter your query"
+          className="query-textbox"
         />
         <button type="submit">Submit</button>
       </form>

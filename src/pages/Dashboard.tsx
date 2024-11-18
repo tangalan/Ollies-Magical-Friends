@@ -85,12 +85,15 @@ export function Dashboard() {
                   <td>{new Date(conversation.createdAt).toLocaleString()}</td>
                   <td>{conversation.bot}</td>
                   <td>
+                  <div className="items-cell">
                     {conversation.items.map((item, index) => (
                       <div key={index}>
                         <strong>{item.role}:</strong> {item.content}
                       </div>
                     ))}
+                    </div>
                   </td>
+                  
                   <td>{conversation.summary}</td>
 
                 </tr>

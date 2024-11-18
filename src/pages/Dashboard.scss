@@ -19,7 +19,7 @@
     }
   
     .column {
-      padding: 20px;
+      padding: 10px;
       overflow-y: auto;
       position: relative; /* Ensure positioning context for absolute positioning */
     }
@@ -36,7 +36,8 @@
         align-items: center;
         justify-content: center; /* Center the content horizontally */
         padding: 8px 16px;
-        min-height: 80px;
+        margin-top: 20px;
+        min-height: 20px;
         text-align: center; /* Center the text */
     
         .content-title {
@@ -85,7 +86,7 @@
       
       .content-block-title {
         flex-shrink: 0;
-        padding-top: 16px;
+        padding-top: 4px;
         padding-bottom: 4px;
         position: relative;
       }
@@ -94,7 +95,7 @@
         position: relative;
         flex-grow: 1;
         padding: 1px 0px;
-        padding-top: 4px;
+        padding-top: 2px;
         line-height: 1.2em;
         overflow: auto;
         &.full {
@@ -106,22 +107,31 @@
         display: flex;
         flex-direction: column;
         height: 80%;
-        padding: 20px;
+        padding: 10px;
         box-sizing: border-box; /* Include padding in height calculation */
         overflow: hidden;
-        margin-right: 20px;
+        margin-right: 10px;
         justify-content: center; /* Center vertically */
         align-items: center; /* Center horizontally */
+        margin-bottom: 10px;
       }
 
       .table-container {
         font-size: 2px; /* Adjust the font size as needed */
+        max-height: 80%; /* Set a fixed height for the table container */
+        overflow-y: auto; /* Enable vertical scrolling */
       }
       
       .table-container th,
       .table-container td {
         font-size: 12px;
         padding: 4px; /* Adjust padding as needed */
+      }
+
+      .table-container td .items-cell {
+        max-height: 100px; /* Set a fixed height for the items cell */
+        overflow-y: auto; /* Enable vertical scrolling */
+        display: block; /* Ensure the content is block-level */
       }
 
     }

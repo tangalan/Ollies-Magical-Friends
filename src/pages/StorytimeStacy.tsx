@@ -71,6 +71,10 @@ export function StorytimeStacy () {
   //   localStorage.setItem('tmp::voice_api_key', apiKey);
   // }
 
+  const openai = new OpenAI({
+    apiKey: process.env.REACT_APP_OPENAI_API_KEY, dangerouslyAllowBrowser: true
+  });
+
   /**
    * Instantiate:
    * - WavRecorder (speech input)
@@ -78,9 +82,7 @@ export function StorytimeStacy () {
    * - RealtimeClient (API client)
    */
 
-  const openai = new OpenAI({
-    apiKey: process.env.REACT_APP_OPENAI_API_KEY, dangerouslyAllowBrowser: true
-  });
+  
 
 
   const wavRecorderRef = useRef<WavRecorder>(
@@ -181,17 +183,17 @@ export function StorytimeStacy () {
     const wavStreamPlayer = wavStreamPlayerRef.current;
 
     // retrieve data from database 
-    try {
-      const response = await fetch(`${process.env.REACT_APP_DATABASE_URL}/conversations`);
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to get data from database: ${errorText}`);
-      }
-      const data = await response.json();
-      console.log('Data retrieved successfully:', data);
-    } catch (error) {
-      console.error('Error pushing data to the database:', error);
-    }
+    // try {
+    //   const response = await fetch(`${process.env.REACT_APP_DATABASE_URL}/conversations`);
+    //   if (!response.ok) {
+    //     const errorText = await response.text();
+    //     throw new Error(`Failed to get data from database: ${errorText}`);
+    //   }
+    //   const data = await response.json();
+    //   console.log('Data retrieved successfully:', data);
+    // } catch (error) {
+    //   console.error('Error pushing data to the database:', error);
+    // }
 
     // Set state variables
     startTimeRef.current = new Date().toISOString();
@@ -268,14 +270,14 @@ export function StorytimeStacy () {
       model: "gpt-4o",
       messages: [
         {"role": "system", "content": "You are a assistant helping a parent summarize their child's conversations with an AI bot. Summarise the input concisely, picking out  content that a parent might want to know about. Inlude any important quotes and details that might be relevant to the parent."},
-        {"role": "user", "content": `Summarise this conversation is point form, based on this transcript in json format: "${JSON.stringify(filteredItems)}"`}
+        {"role": "user", "content": `Summarise this conversation in point form, based on this transcript in json format: "${JSON.stringify(filteredItems)}. Keep the summary brief. "`}
       ]
     }); 
 
     console.log (conv_summary.choices[0].message.content);
     console.log (typeof(conv_summary.choices[0].message.content));
 
-    await pushToDatabase(filteredItems, String(conv_summary.choices[0].message.content) , "StorytimeStacy");
+    await pushToDatabase(filteredItems, String(conv_summary.choices[0].message.content) , "Storytime Stacy");
     // await pushToDatabase(filteredItems);
 
     setIsConnected(false);

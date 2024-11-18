@@ -27,6 +27,7 @@ import { Map } from '../components/Map.js';
 import './StorytimeStacy.scss';
 // import './BuddyBoba.scss';
 import { isJsxOpeningLikeElement } from 'typescript';
+import OpenAI from "openai";
 
 /**
  * Type for result from get_weather() function call
@@ -61,14 +62,19 @@ export function BuddyBoba () {
    * If we're using the local relay server, we don't need this
    */
   
-  const apiKey = LOCAL_RELAY_SERVER_URL
-    ? ''
-    : localStorage.getItem('tmp::voice_api_key') ||
-      prompt('OpenAI API Key') ||
-      '';
-  if (apiKey !== '') {
-    localStorage.setItem('tmp::voice_api_key', apiKey);
-  }
+  const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
+  const openai = new OpenAI({
+    apiKey: process.env.REACT_APP_OPENAI_API_KEY, dangerouslyAllowBrowser: true
+  });
+
+  // const apiKey = LOCAL_RELAY_SERVER_URL
+  //   ? ''
+  //   : localStorage.getItem('tmp::voice_api_key') ||
+  //     prompt('OpenAI API Key') ||
+  //     '';
+  // if (apiKey !== '') {
+  //   localStorage.setItem('tmp::voice_api_key', apiKey);
+  // }
 
   /**
    * Instantiate:
@@ -197,19 +203,71 @@ export function BuddyBoba () {
     }
   }, []);
 
+  /* Push data to the database */
+  const pushToDatabase = async (items:  object[], summary: string, bot: string) => {
+    const dateTime = new Date().toISOString(); // Get current date and time inline
+
+    // const summary = "hello this is a summary"
+    try {
+      const response = await fetch(`${process.env.REACT_APP_DATABASE_URL}/conversations`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Authorization: `Bearer ${process.env.REACT_APP_RENDER_API_KEY}`, // Optional: Use if your backend requires authentication
+        },
+        body: JSON.stringify({bot, items : items, summary }),
+      });
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to push data to the database: ${errorText}`);
+      }
+  
+      const data = await response.json();
+      console.log('Data pushed successfully:', data);
+    } catch (error) {
+      console.error('Error pushing data to the database:', error);
+    }
+  };
+
+
   /**
    * Disconnect and reset conversation state
    */
   const disconnectConversation = useCallback(async () => {
+    const items = clientRef.current.conversation.getItems();
+    const filteredItems = items.map(item => {
+      return {
+          role: item.role,
+          content: item.formatted.transcript || item.formatted.text
+      };
+  });
+  // console.log(typeof(filteredItems));
+  // console.log(filteredItems);
+    const conv_summary = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {"role": "system", "content": "You are a assistant helping a parent summarize their child's conversations with an AI bot. Summarise the input concisely, picking out  content that a parent might want to know about. Inlude any important quotes and details that might be relevant to the parent."},
+        {"role": "user", "content": `Summarise this conversation in point form, based on this transcript in json format: "${JSON.stringify(filteredItems)}. Keep the summary brief. "`}
+      ]
+    }); 
+
+    console.log (conv_summary.choices[0].message.content);
+    console.log (typeof(conv_summary.choices[0].message.content));
+
+    await pushToDatabase(filteredItems, String(conv_summary.choices[0].message.content) , "Buddy Boba");
+    // await pushToDatabase(filteredItems);
+
+
     setIsConnected(false);
     setRealtimeEvents([]);
     setItems([]);
-    setMemoryKv({});
-    setCoords({
-      lat: 37.775593,
-      lng: -122.418137,
-    });
-    setMarker(null);
+    // setMemoryKv({});
+    // setCoords({
+    //   lat: 37.775593,
+    //   lng: -122.418137,
+    // });
+    // setMarker(null);
 
     const client = clientRef.current;
     client.disconnect();
