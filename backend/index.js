@@ -25,7 +25,7 @@ app.get('/conversations', async (req, res) => {
   
 // 2. POST route to create a new conversation
 app.post('/conversations', async (req, res) => {
-    const { summary, items } = req.body;
+    const { summary, items, bot } = req.body;
 
 
     try {
@@ -33,7 +33,8 @@ app.post('/conversations', async (req, res) => {
         const conversation = await prisma.conversation.create({
             data: {
                 summary,
-                items
+                items,
+                bot
             },
         });
         res.status(201).json(conversation); // Respond with the newly created conversation

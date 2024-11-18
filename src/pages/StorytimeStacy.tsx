@@ -224,7 +224,7 @@ export function StorytimeStacy () {
 
 
   /* Push data to the database */
-  const pushToDatabase = async (items:  object[], summary: string) => {
+  const pushToDatabase = async (items:  object[], summary: string, bot: string) => {
     const dateTime = new Date().toISOString(); // Get current date and time inline
 
     // const summary = "hello this is a summary"
@@ -235,7 +235,7 @@ export function StorytimeStacy () {
           'Content-Type': 'application/json',
           // Authorization: `Bearer ${process.env.REACT_APP_RENDER_API_KEY}`, // Optional: Use if your backend requires authentication
         },
-        body: JSON.stringify({items : items, summary }),
+        body: JSON.stringify({bot, items : items, summary }),
       });
   
       if (!response.ok) {
@@ -275,7 +275,8 @@ export function StorytimeStacy () {
     console.log (conv_summary.choices[0].message.content);
     console.log (typeof(conv_summary.choices[0].message.content));
 
-    await pushToDatabase(filteredItems, String(conv_summary.choices[0].message.content));
+    await pushToDatabase(filteredItems, String(conv_summary.choices[0].message.content) , "StorytimeStacy");
+    // await pushToDatabase(filteredItems);
 
     setIsConnected(false);
     setRealtimeEvents([]);
