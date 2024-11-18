@@ -267,8 +267,8 @@ export function StorytimeStacy () {
     const conv_summary = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
-        {"role": "system", "content": "You are a assistant helping a parent summary the transcript of his child's conversations with an AI Bot. Summarise the input in one paragraph, picking out  content that a parent might want to know about. Inlude any important quotes and details that might be relevant to the parent."},
-        {"role": "user", "content": `Summarise this conversation based on this transcript in json format: "${JSON.stringify(filteredItems)}"`}
+        {"role": "system", "content": "You are a assistant helping a parent summarize their child's conversations with an AI bot. Summarise the input concisely, picking out  content that a parent might want to know about. Inlude any important quotes and details that might be relevant to the parent."},
+        {"role": "user", "content": `Summarise this conversation is point form, based on this transcript in json format: "${JSON.stringify(filteredItems)}"`}
       ]
     }); 
 
