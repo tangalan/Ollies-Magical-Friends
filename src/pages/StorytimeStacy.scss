@@ -83,14 +83,50 @@
     justify-content: center;
     align-items: center;
     width: 100%;
+    position: relative;
 
     .centre-image {
       width: 50%; /* Control image width */
       height: auto;
       object-fit: contain; /* Maintain aspect ratio */
+      position: relative; /* Position relatively */
       /* Remove flex properties from image since it's not a container */
     }
-  } 
+  
+
+  .visualization {
+    position: absolute; /* Position absolutely within the .centre-image-container */
+    bottom: 0; /* Position 4px from the bottom */
+    right: 0; /* Position 8px from the right */
+    display: flex;
+    padding: 4px;
+    border-radius: 16px;
+    z-index: 10;
+    gap: 2px;
+  
+    .visualization-entry {
+      display: flex;
+      align-items: center;
+      height: 40px;
+      width: 100px;
+      gap: 4px;
+  
+      &.client {
+        color: #0099ff;
+      }
+  
+      &.server {
+        color: #009900;
+      }
+  
+      canvas {
+        width: 100%;
+      }
+    }
+  }
+} 
+  
+  
 
   
   // .centre-image {
@@ -388,33 +424,33 @@
     }
   }
 
-  .visualization {
-    position: absolute;
-    display: flex;
-    bottom: 4px;
-    right: 8px;
-    padding: 4px;
-    border-radius: 16px;
-    z-index: 10;
-    gap: 2px;
-    .visualization-entry {
-      position: relative;
-      display: flex;
-      align-items: center;
-      height: 40px;
-      width: 100px;
-      gap: 4px;
-      &.client {
-        color: #0099ff;
-      }
-      &.server {
-        color: #009900;
-      }
-      canvas {
-        width: 100%;
-        height: 100%;
-        color: currentColor;
-      }
-    }
-  }
+  // .visualization {
+  //   // position: absolute;
+  //   display: flex;
+  //   bottom: 4px;
+  //   right: 8px;
+  //   padding: 4px;
+  //   border-radius: 16px;
+  //   z-index: 10;
+  //   gap: 2px;
+  //   .visualization-entry {
+  //     position: relative;
+  //     display: flex;
+  //     align-items: center;
+  //     height: 40px;
+  //     width: 100px;
+  //     gap: 4px;
+  //     &.client {
+  //       color: #0099ff;
+  //     }
+  //     &.server {
+  //       color: #009900;
+  //     }
+  //     canvas {
+  //       width: 100%;
+  //       height: 100%;
+  //       color: currentColor;
+  //     }
+  //   }
+  // }
 }
